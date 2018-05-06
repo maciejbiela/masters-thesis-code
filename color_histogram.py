@@ -45,7 +45,7 @@ def compare_hist_one_way(h1, h2):
 
 def find_max_similarity(longer, shorter, l_longer, l_shorter):
     diff = l_longer - l_shorter
-    max_comparison_result = 0
+    max_comparison_result = -1
     for offset in range(diff):
         comparison_result = compare_hist_one_way(longer[offset:offset + l_shorter], shorter)
         max_comparison_result = max(max_comparison_result, comparison_result)
@@ -157,7 +157,7 @@ def derivative(hist):
 
 
 # Experimental
-def longest_code(color_image):
+def longest_code(color_image, breadth=20):
 
     grayscale = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
     mask = grayscale.copy()
@@ -175,8 +175,11 @@ def longest_code(color_image):
             max_length = length
             max_index = index
 
-    rows = with_nans[max_index - 10: max_index + 10]
-    return normalize(histogram(rows))
+    rows = with_nans[max_index - breadth: max_index + breadth]
+    # return normalize(histogram(rows))
+    hist = histogram(rows)
+    margin = int(len(hist) / 100)
+    return hist[5 * margin:-5 * margin]
 
 
 # compare()
