@@ -1,6 +1,5 @@
 import itertools
 import os
-from collections import Counter
 from statistics import mean
 
 import cv2
@@ -8,8 +7,6 @@ import numpy as np
 
 from color_histogram import compare_hist, longest_code
 from rotate import rotate_bound
-
-from matplotlib import pyplot as plt
 
 
 def equalize_light(color_image):

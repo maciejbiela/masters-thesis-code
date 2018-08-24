@@ -101,7 +101,7 @@ def extract_boxed_splint(file):
     return rotate_if_necessary(cropped)
 
 
-def crop_all(numbers=['4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']):
+def crop_all(numbers=['4']):#, '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']):
     for number in numbers:
         print('hmm: ' + number)
         folder = ''
@@ -116,4 +116,4 @@ def crop_all(numbers=['4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'
                     print('Skipping {}'.format(filename))
 
 
-# crop_all()
+crop_all()

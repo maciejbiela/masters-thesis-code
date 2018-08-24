@@ -4,7 +4,6 @@ from collections import Counter
 
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 def select_sample(grayscale, step=50, threshold=100):
@@ -28,6 +27,7 @@ def compare_hist(h1, h2):
     # rotated = compare_hist_one_way(rotated_h1, h2)
     # return max(regular, rotated)
     return regular
+
 
 def compare_hist_one_way(h1, h2):
     h1 = h1.astype('float32')
@@ -158,12 +158,10 @@ def derivative(hist):
 
 # Experimental
 def longest_code(color_image, breadth=20):
-
     grayscale = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
     mask = grayscale.copy()
     with_nans = grayscale.copy().astype('float32')
     with_nans[mask >= 200] = np.nan
-
 
     index = -1
     max_index = 0
@@ -213,16 +211,3 @@ def longest_diff(param):
     sample = select_sample(gray, step=17)
     hist = histogram(sample)
     return normalize(hist)
-
-
-def meh():
-    rc_15_04 = longest_diff('Square-Code.jpg')
-    rc_15_11 = longest_diff('Square2-Code.jpg')
-    _, axarr = plt.subplots(nrows=2, ncols=1, sharex='col')
-    axarr[0].plot(range(np.size(rc_15_04)), rc_15_04)
-    axarr[1].plot(range(np.size(rc_15_11)), rc_15_11)
-    plt.show()
-    print(compare_hist(rc_15_04, rc_15_11))
-
-# TODO:
-# 1. First bucket it up according to angles
