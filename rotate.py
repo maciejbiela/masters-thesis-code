@@ -101,19 +101,16 @@ def extract_boxed_splint(file):
     return rotate_if_necessary(cropped)
 
 
-def crop_all(numbers=['4']):#, '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']):
+def crop_all(folder, numbers=['4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']):
     for number in numbers:
-        print('hmm: ' + number)
-        folder = ''
         for file in os.listdir(folder + number + '/raw'):
             if file.endswith('.png'):
                 try:
                     filename = folder + number + '/raw' + '/' + file
                     cropped = extract_boxed_splint(filename)
                     new_filename = filename.replace('/raw', '').replace('_000', '_')
-                    cv2.imwrite(new_filename, cropped)
+                    print('Rotating {}'.format(new_filename))
+                    if not os.path.isfile(new_filename):
+                        cv2.imwrite(new_filename, cropped)
                 except:
                     print('Skipping {}'.format(filename))
-
-
-crop_all()

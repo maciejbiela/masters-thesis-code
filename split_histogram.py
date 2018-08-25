@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 
 from color_histogram import compare_hist, longest_code
-from rotate import rotate_bound
+from rotate import rotate_bound, crop_all
 
 
 def equalize_light(color_image):
@@ -113,30 +113,75 @@ def print_statistics(output, results):
         print('{}: mean={}'.format(output, mean(non_null_results)))
 
 
-def run_algorithm(numbers=['4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']):
+def results_for_angle(caption, pp, fp, nn, fn):
+    return """
+\\begin{{table}}[H]
+\\centering
+\\begin{{spacing}}{{1.5}}    
+\\begin{{tabular}}{{|l|l|l|}}
+    \\hline
+    \\cellcolor{{gray}} & \\textbf{{Output: Same}} & \\textbf{{Output: Different}} \\\\ [0.5ex]
+    \\hline\\hline
+    \\textbf{{Actual: Same}} & {pp} & {fn} \\\\ [0.5ex]
+    \\hline
+    \\textbf{{Actual: Different}} & {fp} & {nn} \\\\ [0.5ex]
+    \\hline
+\\end{{tabular}}
+\\caption{{{caption}}}
+\\end{{table}}
+        """.format(caption=caption, pp=len(pp), fn=len(fn), fp=len(fp), nn=len(nn))
+
+
+def total_statistics(caption, tpp, tfp, tnn, tfn):
+    output = """
+\\begin{{table}}[H]
+    \\begin{{spacing}}{{1.5}}
+    \\centering
+    \\begin{{tabular}}{{|l|l|l|}}
+        \\hline
+        \\cellcolor{{gray}} & \\textbf{{Output: Same}} & \\textbf{{Output: Different}} \\\\ [0.5ex]
+        \\hline\\hline
+        \\textbf{{Actual: Same}} & {pp} & {fn} \\\\ [0.5ex]
+        \\hline
+        \\textbf{{Actual: Different}} & {fp} & {nn} \\\\ [0.5ex]
+        \\hline
+    \\end{{tabular}}
+    \\caption{{{caption}}}
+\\end{{table}}
+
+        """.format(caption=caption, pp=tpp, fn=tfn, fp=tfp, nn=tnn)
+    tpr = round(tpp / (tpp + tfn), 2)
+    spc = round(tnn / (tnn + tfp), 2)
+    ppv = round(tpp / (tpp + tfp), 2)
+    npv = round(tnn / (tnn + tfn), 2)
+    fpr = round(1 - spc, 2)
+    fnr = round(1 - tpr, 2)
+    fdr = round(1 - ppv, 2)
+    acc = round((tpp + tnn) / (tpp + tfp + tfn + tnn), 2)
+    f1 = round(2 * tpp / (2 * tpp + tfp + tfn), 2)
+    output += f"""
+Sensitivity                 = {tpr}
+Specificity                 = {spc}
+Positive predictive value   = {ppv}
+Negative predictive value   = {npv}
+False positive rate         = {fpr}
+False negative rate         = {fnr}
+False discovery rate        = {fdr}
+Accuracy                    = {acc}
+F1 score                    = {f1}        
+    """
+    return output
+
+
+def run_algorithm(folders, numbers=['4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']):
+    output = ''
+
     tpp = 0
     tfp = 0
     tnn = 0
     tfn = 0
 
-    folder = ''
-    # folder = 'good/'
-    # folder = 'deg_0/'
-    # folder = 'deg_45/'
-    # folder = 'deg_90/'
-    # folder = 'deg_135/'
-    # folder = 'deg_180/'
-    # folder = 'deg_225/'
-    # folder = 'deg_270/'
-    # folder = 'deg_315/'
-    for folder in ['deg_180/']:
-                   # 'deg_45/',
-                   # 'deg_90/',
-                   # 'deg_135/',
-                   # 'deg_180/',
-                   # 'deg_225/',
-                   # 'deg_270/',
-                   # 'deg_315/']:
+    for folder in folders:
 
         codes = []
 
@@ -166,8 +211,8 @@ def run_algorithm(numbers=['4', '5', '6', '7', '8', '9', '10', '11', '12', '13',
             splint1, file1, image1 = first
             splint2, file2, image2 = second
             result = compare(image1, image2)
-            print('{}-{}: {}'.format(file1, file2, result))
-            thresh = .6
+            print('Comparing {}-{}: {}'.format(file1, file2, result))
+            thresh = .635
             if splint1 == splint2:
                 append_result(match, result)
                 if result > thresh:
@@ -193,73 +238,40 @@ def run_algorithm(numbers=['4', '5', '6', '7', '8', '9', '10', '11', '12', '13',
         # print_statistics('Match', match)
         # print_statistics('Mismatch', mismatch)
 
-        print(
-            """
-\\begin{{table}}[H]
-    \centering
-    \\begin{{tabular}}{{|l|l|l|}}
-        \hline
-        \cellcolor{{gray}} & \\textbf{{Output: Same}} & \\textbf{{Output: Different}} \\\\ [0.5ex]
-        \hline\hline
-        \\textbf{{Actual: Same}} & {pp} & {fn} \\\\ [0.5ex]
-        \hline
-        \\textbf{{Actual: Different}} & {fp} & {nn} \\\\ [0.5ex]
-        \hline
-    \end{{tabular}}
-    \caption{{{caption}}}
-\end{{table}}
-            """.format(caption=folder.replace('deg_', 'Results for angle ').replace('/', '$^{\circ}$'), pp=len(pp),
-                       fn=len(fn), fp=len(fp), nn=len(nn))
-        )
+        if (folder.startswith('deg_')):
+            output += results_for_angle(folder.replace('deg_', 'Results for angle ').replace('/', '$^{\circ}$'), pp, fp,
+                                        nn, fn) + '\n'
 
         tpp += len(pp)
         tfp += len(fp)
         tnn += len(nn)
         tfn += len(fn)
 
-    print(
-        """
-\\begin{{table}}[H]
-    \centering
-    \\begin{{tabular}}{{|l|l|l|}}
-        \hline
-        \cellcolor{{gray}} & \\textbf{{Output: Same}} & \\textbf{{Output: Different}} \\\\ [0.5ex]
-        \hline\hline
-        \\textbf{{Actual: Same}} & {pp} & {fn} \\\\ [0.5ex]
-        \hline
-        \\textbf{{Actual: Different}} & {fp} & {nn} \\\\ [0.5ex]
-        \hline
-    \end{{tabular}}
-    \caption{{{caption}}}
-\end{{table}}
-        """.format(caption='Aggregated results', pp=tpp, fn=tfn, fp=tfp, nn=tnn)
-    )
+    if len(folders) > 1:
+        output += total_statistics('Aggregated results', tpp, tfp, tnn, tfn)
+    else:
+        output += total_statistics('Overall results', tpp, tfp, tnn, tfn)
 
-    tpr = tpp / (tpp + tfn)
-    spc = tnn / (tnn + tfp)
-    ppv = tpp / (tpp + tfp)
-    npv = tnn / (tnn + tfn)
-    fpr = 1 - spc
-    fnr = 1 - tpr
-    fdr = 1 - ppv
-    acc = (tpp + tnn) / (tpp + tfp + tfn + tnn)
-    f1 = 2*tpp / (2*tpp + tfp + tfn)
-
-    print(f"""
-Sensitivity                 = {tpr}
-Specificity                 = {spc}
-Positive predictive value   = {ppv}
-Negative predictive value   = {npv}
-False positive rate         = {fpr}
-False negative rate         = {fnr}
-False discovery rate        = {fdr}
-Accuracy                    = {acc}
-F1 score                    = {f1}        
-    """)
+    return output
 
 
 def append_result(list, result):
     list.append(result)
 
 
-run_algorithm()
+def perform_comparisons(folders):
+    for folder in folders:
+        crop_all(folder)
+    return run_algorithm(folders)
+
+
+print(perform_comparisons(['deg_0/',
+                           'deg_45/',
+                           'deg_90/',
+                           'deg_135/',
+                           'deg_180/',
+                           'deg_225/',
+                           'deg_270/',
+                           'deg_315/']))
+
+# print(perform_comparisons(['all/']))

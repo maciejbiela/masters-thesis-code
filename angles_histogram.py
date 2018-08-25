@@ -7,8 +7,9 @@ from collections import Counter
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from color_histogram import compute_code, longest_code
+
 from color_histogram import compare_hist
+from color_histogram import longest_code
 
 
 def equalize_light(color_image):
