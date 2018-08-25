@@ -2,3 +2,4 @@
 .idea/*
 Pipfile.lock
 deg_*/*/*.png
+all/*/*.png

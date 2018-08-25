@@ -116,18 +116,19 @@ def print_statistics(output, results):
 def results_for_angle(caption, pp, fp, nn, fn):
     return """
 \\begin{{table}}[H]
-\\centering
-\\begin{{spacing}}{{1.5}}    
-\\begin{{tabular}}{{|l|l|l|}}
-    \\hline
-    \\cellcolor{{gray}} & \\textbf{{Output: Same}} & \\textbf{{Output: Different}} \\\\ [0.5ex]
-    \\hline\\hline
-    \\textbf{{Actual: Same}} & {pp} & {fn} \\\\ [0.5ex]
-    \\hline
-    \\textbf{{Actual: Different}} & {fp} & {nn} \\\\ [0.5ex]
-    \\hline
-\\end{{tabular}}
-\\caption{{{caption}}}
+    \\centering
+    \\begin{{spacing}}{{1.5}}    
+    \\begin{{tabular}}{{|l|l|l|}}
+        \\hline
+        \\cellcolor{{gray}} & \\textbf{{Output: Same}} & \\textbf{{Output: Different}} \\\\ [0.5ex]
+        \\hline\\hline
+        \\textbf{{Actual: Same}} & {pp} & {fn} \\\\ [0.5ex]
+        \\hline
+        \\textbf{{Actual: Different}} & {fp} & {nn} \\\\ [0.5ex]
+        \\hline
+    \\end{{tabular}}
+    \\caption{{{caption}}}
+    \\end{{spacing}}
 \\end{{table}}
         """.format(caption=caption, pp=len(pp), fn=len(fn), fp=len(fp), nn=len(nn))
 
@@ -147,6 +148,7 @@ def total_statistics(caption, tpp, tfp, tnn, tfn):
         \\hline
     \\end{{tabular}}
     \\caption{{{caption}}}
+    \\end{{spacing}}
 \\end{{table}}
 
         """.format(caption=caption, pp=tpp, fn=tfn, fp=tfp, nn=tnn)
