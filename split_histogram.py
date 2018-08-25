@@ -1,5 +1,6 @@
 import itertools
 import os
+from datetime import datetime
 from statistics import mean
 
 import cv2
@@ -266,14 +267,19 @@ def perform_comparisons(folders):
         crop_all(folder)
     return run_algorithm(folders)
 
+print(datetime.now())
 
-print(perform_comparisons(['deg_0/',
-                           'deg_45/',
-                           'deg_90/',
-                           'deg_135/',
-                           'deg_180/',
-                           'deg_225/',
-                           'deg_270/',
-                           'deg_315/']))
+print(perform_comparisons([
+    'deg_0/',
+    'deg_45/',
+    'deg_90/',
+    'deg_135/',
+    'deg_180/',
+    'deg_225/',
+    'deg_270/',
+    'deg_315/'
+]))
 
 # print(perform_comparisons(['all/']))
+
+print(datetime.now())
