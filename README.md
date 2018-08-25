@@ -1,5 +1,5 @@
 ### Maciej Biela, Master's Thesis code repository
-####Image analysis for the identification of foundry details
+#### Image analysis for the identification of foundry details
 
 ###### Prerequisites
 - OpenCV 3.4.2 with Python Bindings
